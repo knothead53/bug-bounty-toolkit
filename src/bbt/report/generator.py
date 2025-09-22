@@ -2,7 +2,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from pathlib import Path
 import datetime
 
-TEMPLATE_DIR = Path(__file__).resolve().parents[2] / "templates"
+TEMPLATE_DIR = Path(__file__).resolve().parents[3] / "templates"
 
 env = Environment(
     loader=FileSystemLoader(str(TEMPLATE_DIR)),
