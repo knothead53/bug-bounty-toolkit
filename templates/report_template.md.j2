@@ -6,32 +6,54 @@
 - Main domain: `{{ scope.main_domain }}`
 {% if scope.in_scope %}
 - Additional in-scope:
-{% for d in scope.in_scope %}  - `{{ d }}`  
+{% for d in scope.in_scope %}  - `{{ d }}`
 {% endfor %}
 {% endif %}
 
 ---
 
 ## Passive: crt.sh subdomains ({{ scope.passive.crtsh_subdomains | length }})
-
 {% if scope.passive.crtsh_subdomains %}
 Subdomains discovered via certificate transparency (crt.sh):
+
 {% for sd in scope.passive.crtsh_subdomains %}
 - `{{ sd }}`
 {% endfor %}
+
 {% else %}
 No crt.sh subdomains found.
 {% endif %}
 
 ---
 
+## Live Hosts Summary
+{% if live_hosts %}
+A polite HTTP(S) liveness check was performed. Summary:
+
+- **Checked:** {{ live_summary.total_checked }}
+- **Alive:** {{ live_summary.alive_count }}
+- **Unresponsive/Errors:** {{ live_summary.dead_count }}
+- **Evidence file:** `{{ live_summary.file }}`
+
+### Alive hosts (status code • server)
+{% for r in live_hosts %}
+- `{{ r.host }}` — **{{ r.status_code }}** {% if r.server %}• _{{ r.server }}_{% endif %}{% if r.final_url %} • final: `{{ r.final_url }}`{% endif %}
+{% endfor %}
+
+{% else %}
+_No live-check results were found for this scope. Run the **Check Live** step to populate this section._
+{% endif %}
+
+---
+
 ## Notes / Next steps (manual)
-1. Validate the live hosts (HTTP/HTTPS) with `httpx` or `curl` (manual or safe automation).
-2. For hosts in-scope, run non-invasive service enumeration (nmap -sV --version-light) with permission.
-3. Import findings into Burp Suite for manual inspection and active testing (only with explicit permission).
-4. Keep a strict timeline of every action including command used, date/time, and who authorized the test.
+1. Validate alive hosts further (HTTP behavior, redirects, auth, etc.).
+2. For in-scope assets, proceed with approved non-invasive service enumeration.
+3. Import selected hosts into Burp Suite (manual active testing with authorization).
+4. Maintain a strict timeline of actions (commands, timestamps, authorization records).
 
 ---
 
 ## Evidence
 - Scope JSON and raw outputs are saved in the output directory.
+{% if live_hosts %}- Live-check JSON: `{{ live_summary.file }}`{% endif %}

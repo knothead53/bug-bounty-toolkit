@@ -33,7 +33,7 @@ STATIC_DIR = ROOT / "static"
 STATIC_DIR.mkdir(exist_ok=True, parents=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-# NEW: mount output so we can click/download artifacts
+# expose output files for download
 app.mount("/artifacts", StaticFiles(directory=str(OUTPUT_DIR)), name="artifacts")
 
 
@@ -44,14 +44,13 @@ def render(name: str, **ctx) -> HTMLResponse:
 
 def generate_report_files(scope: dict, outdir: Path) -> Path:
     """
-    Uses bbt.report.generator to create Markdown and HTML reports.
-    Returns path to the Markdown file.
+    Create Markdown and HTML reports. Markdown uses report_template.md.j2;
+    HTML is a simple conversion of the generated Markdown.
     """
-    md_text = render_report(scope)
+    md_text = render_report(scope, outdir)
     md_path = outdir / f"{scope['main_domain']}_recon_report.md"
     md_path.write_text(md_text, encoding="utf-8")
 
-    # also save an HTML copy for easy viewing
     html_text = f"""<!doctype html>
 <html><head><meta charset="utf-8"><title>Recon Report — {scope['main_domain']}</title>
 <style>body{{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;max-width:900px;margin:40px auto;line-height:1.5}}
@@ -86,7 +85,10 @@ def init_scope(main_domain: str = Form(...), in_scope: Optional[str] = Form(""),
     scope_file = outdir / f"{scope['main_domain']}_scope.json"
     scope_file.write_text(json.dumps(scope, indent=2))
 
-    message = f"Scope saved to {scope_file.name} — {len(subs)} subdomains found."
+    # also refresh the report (may not have live-check data yet; that's ok)
+    generate_report_files(scope, outdir)
+
+    message = f"Scope saved to {scope_file.name} — {len(subs)} subdomains found. Report generated."
     scopes = sorted(outdir.glob("*_scope.json"))
     return render("home.html", scopes=[p.name for p in scopes], message=message, results=None)
 
@@ -98,7 +100,7 @@ def check_live(scope_file: str = Form(...), output_dir: Optional[str] = Form("ou
     if not sfile.exists():
         return render("home.html", scopes=[p.name for p in outdir.glob("*_scope.json")], message="Scope file not found.", results=None)
 
-    scope = json.loads(sfile.read_text())
+    scope = json.loads(sfile.read_text(encoding="utf-8"))
     subs: List[str] = scope.get("passive", {}).get("crtsh_subdomains", [])
     if not subs:
         return render("home.html", scopes=[p.name for p in outdir.glob("*_scope.json")], message="No subdomains in scope file.", results=None)
@@ -107,8 +109,14 @@ def check_live(scope_file: str = Form(...), output_dir: Optional[str] = Form("ou
     results_file = outdir / f"{scope['main_domain']}_livecheck.json"
     results_file.write_text(json.dumps(results, indent=2))
 
-    view = results[:50]  # preview subset
-    message = f"Live-check done — saved to {results_file.name} (showing {len(view)}/{len(results)} rows)"
+    # re-generate report so Live Hosts Summary appears
+    generate_report_files(scope, outdir)
+
+    view = results[:50]
+    message = (
+        f"Live-check done — saved to {results_file.name} "
+        f"(showing {len(view)}/{len(results)} rows). Report updated."
+    )
     scopes = sorted(outdir.glob("*_scope.json"))
     return render("home.html", scopes=[p.name for p in scopes], message=message, results=view)
 
@@ -122,7 +130,7 @@ def generate_report_route(scope_file: str = Form(...), output_dir: str = Form("o
         return render("home.html", scopes=[p.name for p in scopes],
                       message="Scope file not found.", results=None)
 
-    scope = json.loads(sfile.read_text())
+    scope = json.loads(sfile.read_text(encoding="utf-8"))
     md_path = generate_report_files(scope, outdir)
     main = scope.get("main_domain", "report")
     msg = (
