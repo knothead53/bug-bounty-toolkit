@@ -1,0 +1,108 @@
+[
+  {
+    "host": "as207960 test intermediate - example.com",
+    "tried": [
+      "https://as207960 test intermediate - example.com",
+      "http://as207960 test intermediate - example.com"
+    ],
+    "status_code": null,
+    "server": null,
+    "final_url": null,
+    "error": "HTTPConnectionPool(host='as207960%20test%20intermediate%20-%20example.com', port=80): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPConnection object at 0x000001CF7132A900>: Failed to resolve 'as207960%20test%20intermediate%20-%20example.com' ([Errno 11001] getaddrinfo failed)\"))"
+  },
+  {
+    "host": "m.example.com",
+    "tried": [
+      "https://m.example.com",
+      "http://m.example.com"
+    ],
+    "status_code": null,
+    "server": null,
+    "final_url": null,
+    "error": "HTTPConnectionPool(host='m.example.com', port=80): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPConnection object at 0x000001CF7136E710>: Failed to resolve 'm.example.com' ([Errno 11001] getaddrinfo failed)\"))"
+  },
+  {
+    "host": "dev.example.com",
+    "tried": [
+      "https://dev.example.com",
+      "http://dev.example.com"
+    ],
+    "status_code": null,
+    "server": null,
+    "final_url": null,
+    "error": "HTTPConnectionPool(host='dev.example.com', port=80): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPConnection object at 0x000001CF7136EFD0>: Failed to resolve 'dev.example.com' ([Errno 11001] getaddrinfo failed)\"))"
+  },
+  {
+    "host": "products.example.com",
+    "tried": [
+      "https://products.example.com",
+      "http://products.example.com"
+    ],
+    "status_code": null,
+    "server": null,
+    "final_url": null,
+    "error": "HTTPConnectionPool(host='products.example.com', port=80): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPConnection object at 0x000001CF7136A8B0>: Failed to resolve 'products.example.com' ([Errno 11001] getaddrinfo failed)\"))"
+  },
+  {
+    "host": "support.example.com",
+    "tried": [
+      "https://support.example.com",
+      "http://support.example.com"
+    ],
+    "status_code": null,
+    "server": null,
+    "final_url": null,
+    "error": "HTTPConnectionPool(host='support.example.com', port=80): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPConnection object at 0x000001CF7136AD70>: Failed to resolve 'support.example.com' ([Errno 11001] getaddrinfo failed)\"))"
+  },
+  {
+    "host": "user@example.com",
+    "tried": [
+      "https://user@example.com"
+    ],
+    "status_code": 200,
+    "server": null,
+    "final_url": "https://user@example.com/",
+    "error": null
+  },
+  {
+    "host": "example.com",
+    "tried": [
+      "https://example.com"
+    ],
+    "status_code": 200,
+    "server": null,
+    "final_url": "https://example.com/",
+    "error": null
+  },
+  {
+    "host": "subjectname@example.com",
+    "tried": [
+      "https://subjectname@example.com"
+    ],
+    "status_code": 200,
+    "server": null,
+    "final_url": "https://subjectname@example.com/",
+    "error": null
+  },
+  {
+    "host": "www.example.com",
+    "tried": [
+      "https://www.example.com"
+    ],
+    "status_code": 200,
+    "server": null,
+    "final_url": "https://www.example.com/",
+    "error": null
+  },
+  {
+    "host": "m.testexample.com",
+    "tried": [
+      "https://m.testexample.com",
+      "http://m.testexample.com"
+    ],
+    "status_code": 405,
+    "server": null,
+    "final_url": "http://m.testexample.com/",
+    "error": "HTTPSConnectionPool(host='m.testexample.com', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLError(1, '[SSL: TLSV1_UNRECOGNIZED_NAME] tlsv1 unrecognized name (_ssl.c:1032)')))"
+  }
+]
