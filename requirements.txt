@@ -5,3 +5,4 @@ python-dotenv==1.0.0
 fastapi==0.112.2
 uvicorn==0.30.6
 python-multipart==0.0.9
+markdown==3.6

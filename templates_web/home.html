@@ -2,31 +2,43 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Bug Bounty Toolkit</title>
+  <title>Bug Bounty Toolkit</html></title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root { color-scheme: light dark; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 32px; }
     h1 { margin-bottom: 0.25rem; }
-    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin: 16px 0; }
+    p.sub { color: #666; margin-top: 0; }
+    .row { display:flex; gap: 24px; flex-wrap: wrap; }
+    .col { flex: 1 1 380px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 16px 0; background: #fff; }
+    @media (prefers-color-scheme: dark) {
+      body { background: #111; color: #eaeaea; }
+      .card { border-color: #333; background: #171717; }
+      input, textarea, select { background:#0f0f0f; color:#eaeaea; border-color:#333; }
+      .msg { background:#0f1b38; border-color:#2d4ea4; }
+      code { background:#202020; }
+      button.secondary { background:#0f0f0f; color:#eaeaea; border-color:#444; }
+    }
+
     label { display:block; font-weight:600; margin: 8px 0 4px; }
     input[type=text], textarea, select { width: 100%; padding: 10px; border: 1px solid #bbb; border-radius: 8px; }
     button { padding: 10px 14px; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; cursor: pointer; }
     button.secondary { background: #fff; color: #222; border-color: #bbb; }
-    .row { display:flex; gap: 24px; flex-wrap: wrap; }
-    .col { flex: 1 1 380px; }
     .msg { padding: 10px 14px; background:#f6f8ff; border:1px solid #cddcff; border-radius: 8px; margin: 8px 0 16px; }
     table { border-collapse:collapse; width:100%; }
     th, td { border-bottom:1px solid #eee; text-align:left; padding:8px; font-size: 14px; }
     code { background:#f5f5f5; padding:2px 5px; border-radius:4px; }
-    footer { color:#777; margin-top: 24px; }
+    footer { color:#777; margin-top: 24px; font-size: 13px; }
+    .hint { font-size: 12px; color: #777; margin-top: 6px; }
   </style>
 </head>
 <body>
   <h1>Bug Bounty Toolkit</h1>
-  <p>Passive recon + polite liveness checks — for authorized testing only.</p>
+  <p class="sub">Passive recon + polite liveness checks — for authorized testing only. Outputs are saved to <code>/output</code>.</p>
 
   {% if message %}
-  <div class="msg">{{ message }}</div>
+  <div class="msg">{{ message|safe }}</div>
   {% endif %}
 
   <div class="row">
@@ -36,10 +48,15 @@
         <form method="post" action="/init-scope">
           <label>Main domain</label>
           <input type="text" name="main_domain" placeholder="example.com" required>
+
           <label>Additional in-scope (one per line, optional)</label>
           <textarea name="in_scope" rows="4" placeholder="sub.example.com&#10;api.example.com"></textarea>
+
           <label>Output directory</label>
           <input type="text" name="output_dir" value="output">
+
+          <div class="hint">This action is passive (certificate transparency lookup).</div>
+
           <div style="margin-top:10px;">
             <button type="submit">Run passive recon</button>
           </div>
@@ -57,12 +74,40 @@
               <option value="{{ s }}">{{ s }}</option>
             {% endfor %}
           </select>
+
           <label>Workers (concurrency)</label>
           <input type="text" name="workers" value="4">
+
           <label>Output directory</label>
           <input type="text" name="output_dir" value="output">
+
+          <div class="hint">This action is an <b>active</b>, polite check (HTTPS/HTTP HEAD). Use only with explicit authorization.</div>
+
           <div style="margin-top:10px;">
             <button type="submit">Probe hosts</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h3>3) Generate Report (Markdown + HTML)</h3>
+        <form method="post" action="/generate-report">
+          <label>Scope file</label>
+          <select name="scope_file" required>
+            {% for s in scopes %}
+              <option value="{{ s }}">{{ s }}</option>
+            {% endfor %}
+          </select>
+
+          <label>Output directory</label>
+          <input type="text" name="output_dir" value="output">
+
+          <div class="hint">Generates <code>_recon_report.md</code> and <code>_recon_report.html</code>. Download links will appear above.</div>
+
+          <div style="margin-top:10px;">
+            <button type="submit">Generate Markdown + HTML</button>
           </div>
         </form>
       </div>
@@ -82,8 +127,8 @@
           <td><code>{{ r.host }}</code></td>
           <td>{{ r.status_code if r.status_code else '' }}</td>
           <td>{{ r.server if r.server else '' }}</td>
-          <td>{{ r.final_url if r.final_url else '' }}</td>
-          <td style="color:#b00;">{{ r.error if r.error else '' }}</td>
+          <td style="max-width:350px; overflow-wrap:anywhere;">{{ r.final_url if r.final_url else '' }}</td>
+          <td style="color:#b00; max-width:260px; overflow-wrap:anywhere;">{{ r.error if r.error else '' }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -91,6 +136,6 @@
   </div>
   {% endif %}
 
-  <footer>Ethical use only • Stores JSON in <code>/output</code> • More features coming</footer>
+  <footer>Ethical use only • This toolkit does not automate exploitation • © Your local machine</footer>
 </body>
 </html>
